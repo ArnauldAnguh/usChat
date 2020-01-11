@@ -64,7 +64,8 @@ io.on('connect', function (socket) {
     if (user) {
       io.to(user.room).emit('message', {
         user: 'admin' + '🗣️',
-        text: "".concat(user.name, " has left.")
+        text: "".concat(user.name, " has left."),
+        role: 'admin'
       });
       io.to(user.room).emit('roomData', {
         room: user.room,
