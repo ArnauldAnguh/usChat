@@ -25,15 +25,15 @@ io.on('connect', socket => {
     socket.emit('message', {
       user: 'admin 🗣️',
       text: `${user.name} , welcome to room ${user.room}.`,
-      role: 'admin'
+      role: 'admin',
+      when: new Date().valueOf()
     });
-    socket.broadcast
-      .to(user.room)
-      .emit('message', {
-        user: 'admin 🗣️ ',
-        text: `${user.name} has joined!`,
-        role: 'admin'
-      });
+    socket.broadcast.to(user.room).emit('message', {
+      user: 'admin 🗣️ ',
+      text: `${user.name} has joined!`,
+      role: 'admin',
+      when: new Date().valueOf()
+    });
 
     io.to(user.room).emit('roomData', {
       room: user.room,
@@ -46,7 +46,11 @@ io.on('connect', socket => {
   socket.on('sendMessage', (message, callback) => {
     const user = getUser(socket.id);
 
-    io.to(user.room).emit('message', { user: user.name, text: message });
+    io.to(user.room).emit('message', {
+      user: user.name,
+      text: message,
+      when: new Date().valueOf()
+    });
 
     callback();
   });
@@ -58,7 +62,8 @@ io.on('connect', socket => {
       io.to(user.room).emit('message', {
         user: 'admin' + '🗣️',
         text: `${user.name} has left.`,
-        role: 'admin'
+        role: 'admin',
+        when: new Date().valueOf()
       });
       io.to(user.room).emit('roomData', {
         room: user.room,
@@ -67,7 +72,19 @@ io.on('connect', socket => {
     }
   });
 });
-app.use(cors());
+// CORS Error Handling
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+    res.status(200).json({});
+  }
+  next();
+});
 app.use(route);
 
 const PORT = process.env.PORT || 3000;

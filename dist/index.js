@@ -37,12 +37,14 @@ io.on('connect', function (socket) {
     socket.emit('message', {
       user: 'admin 🗣️',
       text: "".concat(user.name, " , welcome to room ").concat(user.room, "."),
-      role: 'admin'
+      role: 'admin',
+      when: new Date().valueOf()
     });
     socket.broadcast.to(user.room).emit('message', {
       user: 'admin 🗣️ ',
       text: "".concat(user.name, " has joined!"),
-      role: 'admin'
+      role: 'admin',
+      when: new Date().valueOf()
     });
     io.to(user.room).emit('roomData', {
       room: user.room,
@@ -54,7 +56,8 @@ io.on('connect', function (socket) {
     var user = (0, _users.getUser)(socket.id);
     io.to(user.room).emit('message', {
       user: user.name,
-      text: message
+      text: message,
+      when: new Date().valueOf()
     });
     callback();
   });
@@ -65,7 +68,8 @@ io.on('connect', function (socket) {
       io.to(user.room).emit('message', {
         user: 'admin' + '🗣️',
         text: "".concat(user.name, " has left."),
-        role: 'admin'
+        role: 'admin',
+        when: new Date().valueOf()
       });
       io.to(user.room).emit('roomData', {
         room: user.room,
@@ -73,8 +77,19 @@ io.on('connect', function (socket) {
       });
     }
   });
+}); // CORS Error Handling
+
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+    res.status(200).json({});
+  }
+
+  next();
 });
-app.use((0, _cors["default"])());
 app.use(_router["default"]);
 var PORT = process.env.PORT || 3000;
 server.listen(PORT, function () {
