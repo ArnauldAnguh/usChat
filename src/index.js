@@ -47,6 +47,7 @@ io.on('connect', socket => {
     const user = getUser(socket.id);
 
     io.to(user.room).emit('message', {
+      id: socket.id,
       user: user.name,
       text: message,
       when: new Date().valueOf()
@@ -73,6 +74,7 @@ io.on('connect', socket => {
   });
 });
 // CORS Error Handling
+app.use(cors);
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(

@@ -55,6 +55,7 @@ io.on('connect', function (socket) {
   socket.on('sendMessage', function (message, callback) {
     var user = (0, _users.getUser)(socket.id);
     io.to(user.room).emit('message', {
+      id: socket.id,
       user: user.name,
       text: message,
       when: new Date().valueOf()
